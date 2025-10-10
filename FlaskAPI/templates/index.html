@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stock Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 30px;
+        }
+        .container {
+            width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1 { text-align: center; color: #333; }
+        form {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        input[type=text] {
+            padding: 10px;
+            width: 60%;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin-left: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        button:hover { background: #0056b3; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+        th { background-color: #007bff; color: white; }
+        td { background-color: #f9f9f9; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Stock Dashboard</h1>
+
+    <!-- STOCK SEARCH FORM -->
+    <form method="POST">
+        <input type="text" name="ticker" placeholder="Enter Stock Symbol (e.g. AAPL)" required>
+        <button type="submit">Fetch Data</button>
+    </form>
+
+    {% if stock_data %}
+    <h2>{{ stock_data.company_name }}</h2>
+    <p><strong>Sector:</strong> {{ stock_data.sector }}</p>
+    {% endif %}
+
+    {% if Officers_data %}
+    <h3>Company Officers</h3>
+    <table>
+        <tr><th>Name</th><th>Title</th><th>Age</th><th>Total Pay</th></tr>
+        {% for o in Officers_data %}
+        <tr>
+            <td>{{ o.name }}</td>
+            <td>{{ o.title }}</td>
+            <td>{{ o.age }}</td>
+            <td>{{ o.totalPay }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+
+    {% if holders %}
+    <h3>Top Institutional Holders</h3>
+    <table>
+        <tr><th>Holder</th><th>% Held</th><th>Shares</th><th>Value</th><th>% Change</th></tr>
+        {% for h in holders %}
+        <tr>
+            <td>{{ h.Holder }}</td>
+            <td>{{ h.pctHeld }}</td>
+            <td>{{ h.Shares }}</td>
+            <td>{{ h.Value }}</td>
+            <td>{{ h.pctChange }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+</div>
+</body>
+</html>
