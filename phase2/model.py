@@ -136,7 +136,118 @@ def calculate_all_scores(df):
      profit_margin_score=df['margin_score'].fillna(0).clip(0,0.5)*20
      roe_score=df['return_on_equity'].fillna(0).clip(0,1)
      df['groth_score']=(forward_pe_score+profit_margin_score+roe_score)/3
+
+
+     if 'quality_score' not in df.columns:
+          roa=df.get('return_on_assets',pd.Series(0)).fillna(0).clip(0,0.2)*5
+          gross_margin=df.get('gross_margin',pd.Series(0)).fillna(0).clip(0,0.8)*1.25
+          df['quality_score']=(roa+gross_margin)/2
+
+
+     if 'stability_score' not in df.columns:
+          debt_equity=df.get('debt_to_equity',pd.Series(0.5)).fillna(0.5)
+          debt_score=(1+1/debt_equity)
+          current_ratio=df.get('current_ratio',pd.Series(1.5)).fillna(1.5)
+          liquidty_score=(current_ratio.clip(1,3)-1)/2
+          df['stability_score']=(debt_score+liquidty_score)/2
+
+
+     if 'risk_score' not in df.columns:
+          beta=df.get('beta',pd.Series(0).fillna(1.0))
+          beta_score=(beta.clip(0.5,2)-0.5)/1.5
+          volatility=df.get('volatility',pd.Series(0.3).fillna(0.3))
+          vol_score=volatility.clip(0,1)
+          df['risk_score']=(beta_score+vol_score)/2
+
+     df['composite_score']=(
+          df['value_score']*0.25 +
+          df['growth_score']*0.25 +
+          df['quality_score']*0.20 +
+          df['stability_score'] *0.15 +
+          (1-df['risk_score'])*0.15
+     )
+
+     score_columns=['value_score','growth_score','quality_score','stability_score','risk_score']
+
+     for col in score_columns:
+          df[col]=df[col].clip(0,1)
+
      
+     return df
+
+
+
+def build_feature_matrix(Stock_data):
+     sector_dummies=pd.get_dummies(stock_data['sector'],prefix='sector')
+
+     feature_columns = [
+    'value_score', 'growth_score', 'quality_score', 'stability_score', 'risk_score',
+    'composite_score', 'market_cap', 'pe_ratio', 'dividend_yield', 'volatility', 'beta']
+
+     numerical_featrue=stock_data[feature_columns].fillna(0)
+     feature_matrix=pd.concat([numerical_featrue,sector_dummies],axis=1)
+
+     feature_matrix=pd.DataFrame(
+          scaler.fit_transform(feature_matrix),
+          columns=feature_matrix.columns,
+          index=feature_matrix.index
+     )     
+
+     return feature_matrix
+
+
+def get_user_input(input_info):
+     target_stock=input("Enter The Target Stock (if you want to otherwise Skip)")
+     if target_stock=="":
+          target_stock=None
+
+     while True:
+          try:
+               budget=input('Enter Your Investment Budget').replace(",","")
+               if budget<=0:
+                    print('Enter the busget again')
+                    continue
+
+          except ValueError:
+               print("Enter The Valid input for this")
+
+     
+     risk_mapping={
+          '1':'low',
+          '2': 'medium',
+          '3' : 'high'
+
+     }
+
+     while True:
+          risk_choice=input("Enter the Number 1 ,2 ,3 ").strip()
+          if risk_choice in risk_mapping:
+               risk_capacity=risk_mapping[risk_choice]
+               break
+          else:
+               print("Enter the Valid number 1,2 or 3 ")
+
+     sector_intrested=input("Enter the Sector Your are intrested in ")
+     if sector_intrested=="":
+          sector_intrested="Any"
+
+     
+     while True:
+          try:
+               horizon=input("Enter the horizon of your Investment")
+               if horizon<=0:
+                    print("IT should be greater than 1")
+                    continue
+               investment_horizon=horizon
+               break
+          except ValueError:
+               print("Enter the Valid Number for this")
+               
+          
+
+
+
+
 
 
 
