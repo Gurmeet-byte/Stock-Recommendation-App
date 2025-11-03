@@ -5,6 +5,8 @@ from src.fetch_historical_prices import fetch_historical_data
 
 
 
+
+
 def main():
     sp500df=fetch_sp500_list()
     symbols=sp500df['Symbol'].tolist()
@@ -15,6 +17,7 @@ def main():
     # model,features=train_ml_model(r"C:\Users\abc\StockApp\phase3\data\preprocessed\cleaned_data.csv")
     # recommendations=score_stocks(r"C:\Users\abc\StockApp\phase3\data\preprocessed\cleaned_data.csv")
     pricedf=fetch_historical_data(symbols,months_ahead=6)
+
 
     # print(recommendations)
 
