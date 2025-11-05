@@ -6,10 +6,10 @@ import yfinance as yf
 from datetime import datetime
 import os
 
-st.title("📈 AI Stock Recommendation System")
+st.title(" AI Stock Recommendation System")
 st.write("Get personalized stock suggestions based on your preferences and real-time data.")
 
-# ------------------- MODEL LOADING -------------------
+
 @st.cache_resource
 def load_model_and_scaler():
     scaler_path = r'C:\Users\abc\StockApp\phase8\models\scaler.pkl'
@@ -23,7 +23,6 @@ def load_model_and_scaler():
 
 scaler, model = load_model_and_scaler()
 
-# ------------------- DATA FETCHING -------------------
 @st.cache_data
 def live_fetch_data(symbols):
     all_data = []
@@ -65,7 +64,7 @@ def live_fetch_data(symbols):
     return df
 
 
-# ------------------- RECOMMENDER FUNCTION -------------------
+
 def predict_and_recommend(model, scaler, live_df, budget, sector_pref, horizon, target_stock):
     feature_cols = [
         "PE_Ratio", "EPS", "ROE", "DebtToEquity", "Price",
@@ -74,7 +73,7 @@ def predict_and_recommend(model, scaler, live_df, budget, sector_pref, horizon, 
         "Quality_Score", "Growth_Score"
     ]
 
-    # rename any correct spellings back to match training
+   
     rename_map = {
         "Volatility": "Volatality",
         "Volatility_index": "Volatality_index"
@@ -83,7 +82,6 @@ def predict_and_recommend(model, scaler, live_df, budget, sector_pref, horizon, 
 
     available_features = [f for f in feature_cols if f in live_df.columns]
 
-    # Ensure missing columns are filled with zeros (for scaler compatibility)
     for col in feature_cols:
         if col not in live_df.columns:
             live_df[col] = 0
@@ -94,7 +92,7 @@ def predict_and_recommend(model, scaler, live_df, budget, sector_pref, horizon, 
     live_df['Predicted_score'] = preds
     df = live_df[live_df['Price'] <= budget].copy()
 
-    # --- Sector Cleaning ---
+
     if "Sector" not in df.columns:
         df['Sector'] = "Unknown"
 
@@ -109,13 +107,13 @@ def predict_and_recommend(model, scaler, live_df, budget, sector_pref, horizon, 
     if sector_pref_clean != "any":
         df = df[df["Sector_clean"].str.contains(sector_pref_clean, na=False)]
 
-    # --- Target Stock Prioritization ---
+  
     if target_stock.upper() in df['Symbol'].values:
         target_sector = df.loc[df['Symbol'] == target_stock.upper(), "Sector_clean"].values[0]
         related_stock = df[df['Sector_clean'] == target_sector]
         df = pd.concat([related_stock, df]).drop_duplicates(subset="Symbol", keep='first')
 
-    # --- Sorting by investment horizon ---
+
     if horizon == 'short':
         df = df.sort_values(by='Volatality', ascending=True)
     elif horizon == 'long':
@@ -124,8 +122,8 @@ def predict_and_recommend(model, scaler, live_df, budget, sector_pref, horizon, 
     return df.head(10)
 
 
-# ------------------- UI SECTION -------------------
-st.subheader("🧮 Input Parameters")
+
+st.subheader(" Input Parameters")
 
 col1, col2, col3 = st.columns(3)
 with col1:
@@ -151,19 +149,19 @@ default_symbols = [
 user_symbols = st.text_area("Enter Stock Symbols (comma-separated)", ",".join(default_symbols))
 user_symbols = [s.strip().upper() for s in user_symbols.split(",") if s.strip()]
 
-# ------------------- MAIN ACTION -------------------
+
 if st.button("🔍 Generate Recommendations"):
     with st.spinner("Fetching live data..."):
         df = live_fetch_data(user_symbols)
 
     if df.empty:
-        st.warning("⚠️ No live data fetched. Please try again later.")
+        st.warning(" No live data fetched. Please try again later.")
     else:
         recommendations = predict_and_recommend(model, scaler, df, budget, sector_pref, horizon, target_stock)
         if recommendations.empty:
-            st.warning(f"⚠️ No stocks matched your inputs. Available sectors: {df['Sector'].dropna().unique()}")
+            st.warning(f" No stocks matched your inputs. Available sectors: {df['Sector'].dropna().unique()}")
         else:
-            st.success("✅ Top Recommended Stocks")
+            st.success(" Top Recommended Stocks")
             st.dataframe(
                 recommendations[["Symbol", "Sector", "Price", "Predicted_score"]],
                 use_container_width=True
