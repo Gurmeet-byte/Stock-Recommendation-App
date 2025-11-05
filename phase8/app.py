@@ -17,8 +17,16 @@ st.write("Get personalized stock suggestions based on your preferences and real-
 
 @st.cache_resource
 def load_model_and_scaler():
-    scaler_path = r'C:\Users\abc\StockApp\phase8\models\scaler.pkl'
-    model_path = r'C:\Users\abc\StockApp\phase8\models\stock_recommendor_model(2).pkl'
+    base_path=os.path.dirname(os.path.abspath(__file__))
+    models_path=os.path.join(base_path,'models')
+
+    scaler_path = os.path.join(models_path,'scaler.pkl')
+    model_path = os.path.join(models_path,'stock_recommendor_model(2).pkl')
+
+    if not  os.path.exists(scaler_path):
+        raise FileNotFoundError("The Scaler file Didn't exist")
+    if not os.path.exists(model_path):
+        raise FileNotFoundError("The model file didn't exists ")
     with open(scaler_path, 'rb') as f:
         scaler = pkl.load(f)
     with open(model_path, "rb") as f:
