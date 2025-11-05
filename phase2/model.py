@@ -83,6 +83,7 @@ def ticker_to_name(company_name: Optional[str]) -> Optional[str]:
             return info['symbol']
     except Exception:
         pass
+    
 
     # fuzzy-ish match
     for company, ticker in company_to_ticker.items():
