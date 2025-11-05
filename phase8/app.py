@@ -5,6 +5,11 @@ import pickle as pkl
 import yfinance as yf
 from datetime import datetime
 import os
+import traceback
+try:
+    import yfinance as yf
+except Exception as e:
+    st.error(traceback.format_exc())
 
 st.title(" AI Stock Recommendation System")
 st.write("Get personalized stock suggestions based on your preferences and real-time data.")
